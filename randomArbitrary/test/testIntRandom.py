@@ -23,7 +23,7 @@ class TestGeneralRandomInteger(testGeneral.TestRNG):
                 xValues.sort()
                 xValues = np.unique(xValues)
             pValues = np.arange(len(xValues)) + 1
-            rng = randomArbitrary.GeneralRandomInteger(xValues, pValues)
+            rng = randomArbitrary.RandomArbitraryInteger(xValues, pValues)
             rValues = rng.random(SAMPLES)
             count = defaultdict(int)
             for v in rValues:
@@ -40,7 +40,7 @@ class TestGeneralRandomInteger(testGeneral.TestRNG):
         for i in range(nPoints):
             pValues = np.arange(nPoints) + 1
             pValues[i] = 0.0
-            rng = randomArbitrary.GeneralRandomInteger(x=xValues,
+            rng = randomArbitrary.RandomArbitraryInteger(x=xValues,
                                                        p=pValues)
             r = rng.random(TIMES)
             f = filter(lambda v: v==i, r)
@@ -108,7 +108,7 @@ class TestGeneralRandomInteger(testGeneral.TestRNG):
                     sel = (np.random.random(len(x)) > 0.9)
                     p[sel] = 0.0
                     n = np.sum(p != 0)
-                rng = randomArbitrary.GeneralRandomInteger(x, p)
+                rng = randomArbitrary.RandomArbitraryInteger(x, p)
                 smpl = rng.random(SAMPLES)
                 pdf = self._compareDiscreteDistributions(x, p, smpl)
                 if pdf < ALPHA:

@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class GeneralRandom:
+class RandomArbitrary:
     """This class enables us to generate random numbers with an arbitrary 
     distribution.
     

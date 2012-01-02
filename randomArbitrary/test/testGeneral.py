@@ -7,16 +7,16 @@ import randomArbitrary
 import numpy as np
 
 class TestRNG(unittest.TestCase):
-    classes = [randomArbitrary.GeneralRandom,
-               randomArbitrary.GeneralRandomInteger]
+    classes = [randomArbitrary.RandomArbitrary,
+               randomArbitrary.RandomArbitraryInteger]
                
     def _dummyrandomArbitraryObject(self):
-        r = randomArbitrary.GeneralRandom()
+        r = randomArbitrary.RandomArbitrary()
         return r
         
     def _dummyrandomArbitraryIntegerObject(self):
         x = np.arange(10) + 1
-        r = randomArbitrary.GeneralRandomInteger(x)
+        r = randomArbitrary.RandomArbitraryInteger(x)
         return r
     
     def testRandDefaultIsScalar(self):

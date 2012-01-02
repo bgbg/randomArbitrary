@@ -1,2 +1,2 @@
-from floatRandom import GeneralRandom
-from intRandom import GeneralRandomInteger
+from floatRandom import RandomArbitrary
+from intRandom import RandomArbitraryInteger

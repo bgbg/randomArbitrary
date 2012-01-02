@@ -1,7 +1,7 @@
 import random
 import math
 
-class GeneralRandomInteger():
+class RandomArbitraryInteger():
     '''Random integer numbers from an arbitrary distribution.
     
     This algorithm is based on
@@ -108,7 +108,7 @@ class GeneralRandomInteger():
         return ret + self._xmin
             
 if __name__ == '__main__':
-    rng = GeneralRandomInteger(range(3), [1, 2, 3])
+    rng = RandomArbitraryInteger(range(3), [1, 2, 3])
     smpl = rng.random(5000)
     from collections import defaultdict
     count = defaultdict(int)

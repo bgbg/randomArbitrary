@@ -8,13 +8,13 @@ import randomArbitrary
 class TestGeneralRandomFloat(testGeneral.TestRNG):
     def testDefaultRNGFloat(self):
         '''general RNG can be initialized and used without parameters'''
-        obj = randomArbitrary.GeneralRandom()
+        obj = randomArbitrary.RandomArbitrary()
         obj.random()
         
     def testDefaultRNGFloatValues(self):
         '''default object of general RNG returns values in range [0, 1)'''
         N = 10000
-        obj = randomArbitrary.GeneralRandom()
+        obj = randomArbitrary.RandomArbitrary()
         values = obj.random(N)
         self.assertTrue(np.min(values)>=0)
         self.assertTrue(np.max(values)<1)
@@ -27,7 +27,7 @@ class TestGeneralRandomFloat(testGeneral.TestRNG):
             tmp = np.random.randint(-1000., 1000, size=2)
             mn = min(tmp); mx = max(tmp)
             x = np.linspace(mn, mx, TIMES, endpoint=True)
-            rng = randomArbitrary.GeneralRandom(x)
+            rng = randomArbitrary.RandomArbitrary(x)
             values = rng.random(N)
             mnValues = min(values)
             mxValues = max(values)
