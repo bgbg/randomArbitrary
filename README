@@ -1,0 +1,10 @@
+Random numbers from arbitrary distributions.
+Author Boris Gorelik (http://gorelik.net).
+The module contains code based on code by  Kaushik Ghose, 
+copied on Dec 6 2011 from http://code.activestate.com/recipes/576556/ 
+
+
+This module contains arbitrary distribution random number generators. I use 
+it for another project of mine, but think it deserves a separate repo.
+
+This module is distributed under the MIT license
