@@ -1,5 +1,4 @@
 import unittest
-from matplotlib import pylab as plt
 
 import sys
 sys.path.append(r'../asop')
@@ -7,6 +6,8 @@ import randomArbitrary
 import numpy as np
 
 class TestRNG(unittest.TestCase):
+    '''Module-wide tests'''
+    
     classes = [randomArbitrary.RandomArbitrary,
                randomArbitrary.RandomArbitraryInteger]
                

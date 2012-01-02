@@ -78,15 +78,16 @@ class TestGeneralRandomInteger(testGeneral.TestRNG):
             pdf = stats.chi2.pdf(chi2, k)
         else:
             table = np.vstack((observed, expected))
-            pdf = stats.fisher_exact(table)[1]
+            pdf = stats.fisher_exact(table)[1] #@UndefinedVariable
         return pdf
     
     def testRNGIntegerFollowsDistribution(self):
+        raise NotImplementedError('This function should be implemented,'\
+                                  ' but it is very buggy')
         TIMES = 100
         SAMPLES = 1000
         ALPHA = 0.01
         countPvaluesBelowAlpha = 0
-        out = open(r'G:\eclipsetemp\randomArbitrary\src\randomArbitrary\test\zzz.txt', 'w')
         for nx in range(2, 40, 2):
             for t in range(TIMES): #@UnusedVariable
 #                nx = np.random.randint(2, 40)
@@ -94,27 +95,16 @@ class TestGeneralRandomInteger(testGeneral.TestRNG):
                 while n < 2:
                     x = np.random.randint(-100, 100, nx)
                     x.sort()
-                    x = np.unique(x)
-                    
-    #                r = np.random.random()
-    #                if r < 0.33:
-    #                    p = np.random.randint(0, 100, len(x))
-    #                elif r < 0.66:
-    #                    p = np.random.random(len(x))
-    #                else:
-    #                    #huge differences between p values
-    #                    p = np.exp(np.random.randn(len(x)) * 10)
+                    x = np.unique(x) 
                     p = np.random.random(len(x)) 
                     sel = (np.random.random(len(x)) > 0.9)
                     p[sel] = 0.0
-                    n = np.sum(p != 0)
+                    n = np.sum(p != 0) #at least non-zero beans
                 rng = randomArbitrary.RandomArbitraryInteger(x, p)
                 smpl = rng.random(SAMPLES)
                 pdf = self._compareDiscreteDistributions(x, p, smpl)
                 if pdf < ALPHA:
                     countPvaluesBelowAlpha += 1
-                out.write('(%d, %s, %s, %.3f),\n'%(nx, repr(x), repr(p), pdf))
-#            print 'count:', countPvaluesBelowAlpha
         if countPvaluesBelowAlpha > TIMES * ALPHA:
             self.fail()
         

@@ -37,7 +37,8 @@ class TestGeneralRandomFloat(testGeneral.TestRNG):
             
     def testRNGFloatNumbersFollowDistribution(self):
         '''Generated numbers must agree with specified distribution'''
-        raise NotImplementedError()
+        raise NotImplementedError('This function should be implemented, but it is not')
+        
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
