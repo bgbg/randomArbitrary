@@ -37,7 +37,18 @@ class TestRNG(unittest.TestCase):
                 for b in lBad]
             self.fail(msg)
             
-            
+    
+    def testRaiseExceptionOnAllZeroPValues(self):
+        '''If sum of the requested p values is 0, should raise exception'''
+        
+        n = 3
+        x = range(n)
+        p = [0, ] * n
+        for cls in (randomArbitrary.RandomArbitrary,
+                    randomArbitrary.RandomArbitraryInteger):
+            self.assertRaises(ValueError, cls,
+                              (x, p)) 
+    
     def testRandNIsIterable(self):
         '''random(N) should return a iterable with length N for each N>1'''
         lBad = set()
