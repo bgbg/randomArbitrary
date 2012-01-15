@@ -47,66 +47,88 @@ class TestGeneralRandomInteger(testGeneral.TestRNG):
             self.assertTrue(len(f)==0)
                 
     @staticmethod
-    def _compareDiscreteDistributions(x, p, theSample):
-        '''chi2 test that the difference between distributions is random
+    def _chi2testSampleAgainsProbability(observed, expectedProbabilities):
+        '''chi2 test to test whether a sample is consistent with expected prob.
         
-        Compare the discrete distribution that is defined by `x` and `p` to
-        the `sample` using chi2 test. Return p-value that the difference
-        between the expected and the observed CDF's is random. If PDF is
-        defined using two values (i.e len(x)==2), exact Fisher's test is used
+        This function works only with integer samples in the range [0, n), where
+        n is a natural number
+        
+        @param observed: the observed sample
+        @param expectedProbabilities: list of expected probabilities. Value at
+            index `i` corresponds to the probability of integer `i`.
+        @return: (chi2, pval)
         '''
-        nCells = len(x)    
-        assert len(x) == len(p)
-
-        nPoints = len(theSample)        
-        expected = np.array(p, dtype=float) / np.sum(p)
-        sel = [expected > 0]
-        expected = expected[sel]
-        expected *= nPoints
-        
-        observed = [0] * nCells
-        for i in range(len(x)):
-            n = np.sum(theSample == x[i])
-            observed[i] = n
-        observed = np.array(observed)[sel]
-        nCells = len(observed)
-        if nCells == 1:
-            pdf = 0.0
-        elif nCells >= 2:
-            chi2 = np.sum(((observed - expected) ** 2) / expected)
-            k = len(x) - 1
-            pdf = stats.chi2.pdf(chi2, k)
-        else:
-            table = np.vstack((observed, expected))
-            pdf = stats.fisher_exact(table)[1] #@UndefinedVariable
-        return pdf
+        expectedProbabilities = np.array(expectedProbabilities)
+        countO = defaultdict(int)
+        for o in observed: countO[o] += 1
+        keys = range(len(expectedProbabilities))
+        countObserved = np.array([countO[k] for k in keys], dtype=float) 
+        countObserved = countObserved / countObserved.sum()
+        chi2 = np.sum((countObserved - expectedProbabilities) ** 2 / expectedProbabilities)
+        df = len(keys) - 1
+        pVal = 1.0 - stats.distributions.chi2.cdf(chi2, df)
+        return (chi2, pVal)
+    
+   
     
     def testRNGIntegerFollowsDistribution(self):
-        raise NotImplementedError('This function should be implemented,'\
-                                  ' but it is very buggy')
-        TIMES = 100
-        SAMPLES = 1000
         ALPHA = 0.01
-        countPvaluesBelowAlpha = 0
-        for nx in range(2, 40, 2):
-            for t in range(TIMES): #@UnusedVariable
-#                nx = np.random.randint(2, 40)
-                n = 0
-                while n < 2:
-                    x = np.random.randint(-100, 100, nx)
-                    x.sort()
-                    x = np.unique(x) 
-                    p = np.random.random(len(x)) 
-                    sel = (np.random.random(len(x)) > 0.9)
-                    p[sel] = 0.0
-                    n = np.sum(p != 0) #at least non-zero beans
-                rng = randomArbitrary.RandomArbitraryInteger(x, p)
-                smpl = rng.random(SAMPLES)
-                pdf = self._compareDiscreteDistributions(x, p, smpl)
-                if pdf < ALPHA:
-                    countPvaluesBelowAlpha += 1
-        if countPvaluesBelowAlpha > TIMES * ALPHA:
-            self.fail()
+        SAMPLES = 100
+        REPEATS = 1000
+        lMsg =[]
+        createPValuesInteger = ('Integer p values',
+                                lambda nSamples: np.random.randint(0, n, nSamples))
+        createPValuesFloat = ('Float p values', 
+                              lambda  nSamples: np.random.rand(nSamples))
+        createPValiuesLargeDifferences = ('Large differences in p values',
+                                          lambda nSamples: np.exp(np.random.randn(nSamples)))
+        pValueGenerators = (createPValuesInteger, createPValuesFloat,
+                            createPValiuesLargeDifferences)  
+        
+        for name, pGenerator in pValueGenerators:
+            falsePositives = 0
+            for i in range(REPEATS): #@UnusedVariable
+                n = np.random.randint(3, 20)
+                x = range(n)
+                theSum = 0
+                while theSum <= 0:
+                    pValuesRequested = pGenerator(n)
+                    theSum = sum(pValuesRequested)
+                rng = randomArbitrary.RandomArbitraryInteger(x=x, p=pValuesRequested)
+                theSample = rng.random(SAMPLES)
+                pValuesNormalized = np.divide(pValuesRequested, 
+                                              float(sum(pValuesRequested)))
+                p = self._chi2testSampleAgainsProbability(theSample, 
+                                                          pValuesNormalized)[1]
+                if p < ALPHA:
+                    falsePositives += 1
+                
+        
+            #Binomial test.
+            #At this point we expect that falsePositives will not be significantly
+            # higher than ALPHA * REPEATS 
+            #failureFractionValues are above ALPHA. Let's use binomial test to 
+            #test it  
+            nExpectedFalsePositives = int(REPEATS*ALPHA)
+            if falsePositives > nExpectedFalsePositives:
+                pBinomialTest = stats.binom_test(falsePositives, 
+                                                 REPEATS, 
+                                                 ALPHA) * 2 #one-sided test, thus *2
+                if pBinomialTest < ALPHA:
+                    #shit, there might be a problem
+                    msg = '(%s) Failed sampling distribution test '\
+                        'Expected %d failures or less, observed %d ones (p=%.3f). '\
+                        "Don't panic. "\
+                        'This might happen once in a while even if everything is OK. '\
+                        'Repeat the test and hope for the best'%(name, nExpectedFalsePositives,
+                                                                 falsePositives, 
+                                                                 pBinomialTest)
+                    lMsg.append(msg)
+        if lMsg:
+            self.fail('. '.join(lMsg))
+            
+            
+
         
 
 if __name__ == "__main__":

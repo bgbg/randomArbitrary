@@ -34,7 +34,10 @@ class RandomArbitrary:
         """
         
         self.x = x
-        self.pdf = p / p.sum() #normalize it
+        p = np.array(p)
+        self.pdf = p 
+        if  p.sum() > 0:
+            self.pdf /= p.sum() #normalize it
         self.cdf = self.pdf.cumsum()
         self.inversecdfbins = Nrl
         self.Nrl = Nrl

@@ -47,7 +47,7 @@ class TestRNG(unittest.TestCase):
         for cls in (randomArbitrary.RandomArbitrary,
                     randomArbitrary.RandomArbitraryInteger):
             self.assertRaises(ValueError, cls,
-                              (x, p)) 
+                              *(x, p)) 
     
     def testRandNIsIterable(self):
         '''random(N) should return a iterable with length N for each N>1'''
