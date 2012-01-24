@@ -35,9 +35,12 @@ class RandomArbitrary:
         
         self.x = x
         p = np.array(p)
+        if not np.all(p >= 0):
+            raise ValueError('Negative PDF values are not allowed')
+        elif np.all(p == 0):
+            raise ValueError('At least one PDF non-zero value is required')
         self.pdf = p 
-        if  p.sum() > 0:
-            self.pdf /= p.sum() #normalize it
+        self.pdf /= p.sum() #normalize it, it is provided that the sum >0
         self.cdf = self.pdf.cumsum()
         self.inversecdfbins = Nrl
         self.Nrl = Nrl

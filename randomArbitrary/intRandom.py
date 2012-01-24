@@ -42,7 +42,12 @@ class RandomArbitraryInteger():
         for v in p:
             assert v >= 0
         p = map(float, p)
+        for v in p:
+            if v < 0:
+                raise ValueError('Negative PDF values are not allowed')
         sump = sum(p)
+        if sump == 0:
+            raise ValueError('At least one non-zero PDF value is required')
         p = [v/sump for v in p]
         n = len(p)
         self._n = n
