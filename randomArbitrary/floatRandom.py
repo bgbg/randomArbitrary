@@ -34,7 +34,7 @@ class RandomArbitrary:
         """
         
         self.x = x
-        p = np.array(p)
+        p = np.array(p, dtype=float)
         if not np.all(p >= 0):
             raise ValueError('Negative PDF values are not allowed')
         elif np.all(p == 0):
@@ -86,4 +86,9 @@ class RandomArbitrary:
             y = y[0]
         return y
         
+        
+            
+        
+if __name__ == '__main__':
+    pass
         
