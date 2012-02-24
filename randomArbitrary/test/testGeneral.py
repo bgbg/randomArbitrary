@@ -21,22 +21,23 @@ class TestRNG(unittest.TestCase):
         return r
     
     def testRandDefaultIsScalar(self):
-        '''random() should return a scalar'''
+        '''random() and random(None) should return a scalar'''
         lBad = []
         obj = self._dummyrandomArbitraryObject()
         r = obj.random()
-        if not np.isscalar(r):
+        rn = obj.random(None)
+        if not (np.isscalar(r) and np.isscalar(rn)):
             lBad.append(obj.__class__)
-        
         obj = self._dummyrandomArbitraryIntegerObject()
         r = obj.random()
-        if not np.isscalar(r):
+        rn = obj.random(None)
+        if not (np.isscalar(r) and np.isscalar(rn)):
             lBad.append(obj.__class__)
         if lBad:
             msg = ['%s: random(1) returned a non-scalar value'%str(b)
                 for b in lBad]
             self.fail(msg)
-            
+   
     
     def testRaiseExceptionOnAllZeroPValues(self):
         '''If sum of the requested p values is 0, should raise exception'''
