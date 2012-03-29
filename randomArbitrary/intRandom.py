@@ -1,5 +1,6 @@
 import random
 import math
+import numpy as np
 
 issortedAndUnique = lambda l: np.all([l[i] < l[i+1] for i in xrange(len(l)-1)])
 
