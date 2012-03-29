@@ -1,10 +1,12 @@
 import random
 import math
-from copy import deepcopy
+
+issortedAndUnique = lambda l: np.all([l[i] < l[i+1] for i in xrange(len(l)-1)])
+
 
 class RandomArbitraryInteger():
     '''Random integer numbers from an arbitrary distribution.
-    
+
     This algorithm is based on
     Vose, A Linear Algorithm For Generating Random
     Numbers With a Given Distribution
@@ -13,27 +15,25 @@ class RandomArbitraryInteger():
     '''
     def __init__(self, x, p=None):
         '''Initialize the object
-        
+
         @param x: integer that will be used by the generator
-        @param p: probability density proile for the distribution. 
+        @param p: probability density proile for the distribution.
             If None (default) every value in `x` will have the same probability
         '''
-        
-        if len(x) < 2:
-            raise ValueError('At least two values are required')
-        
+
         if p is None:
             p = [1.0, ] * len(x)
         assert len(x) == len(p)
         self.set_pdf(x, p)
-          
-    
+
     def set_pdf(self, x, p):
+        '''Set the internal probability distribution function
+        '''
+
+        assert len(x) == len(p)
         x = map(int, x)
-        xSorted = list(x); xSorted.sort()
-        assert xSorted == x
-        assert len(x) == len(set(x))
-        
+        assert issortedAndUnique(x)
+
         xMin = x[0]
         xMax = x[-1]
         xActual = range(xMin, xMax + 1, 1)
@@ -58,7 +58,7 @@ class RandomArbitraryInteger():
         p = [v/sump for v in p]
         n = len(p)
         self._n = n
-        
+
         #first stage -- divide indices to small and large
         large = []
         small = []
@@ -68,7 +68,7 @@ class RandomArbitraryInteger():
                 large.append(j)
             else:
                 small.append(j)
-        
+
         #second stage
         prob = [None,] * n
         alias = [None,] * n
@@ -86,13 +86,14 @@ class RandomArbitraryInteger():
             prob[s] = 1.0
         for l in large:
             prob[l] = 1.0
+
         self._prob = prob
-        self._alias = alias     
-                
-        
+        self._alias = alias
+
+
     def random(self, n=None):
         '''Return random number or numbers
-        
+
         @param n: amount of random values to return or None
         @return: if n is None: return a scalar, if n>=1 return a list with n
             elements, else raise an exception
@@ -103,7 +104,7 @@ class RandomArbitraryInteger():
         else:
             assert n > 0
             return [self._randOne() for i in range(n)] #@UnusedVariable
-    
+
     def _uniformN(self):
         return random.random() * self._n
 
@@ -117,9 +118,7 @@ class RandomArbitraryInteger():
             ret = self._alias[j]
         return ret + self._xmin
 
-                
 
 if __name__ == '__main__':
     pass
-
 
