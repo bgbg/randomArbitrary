@@ -1,9 +1,12 @@
 import random
 import math
 
+issortedAndUnique = lambda l: np.all([l[i] < l[i+1] for i in xrange(len(l)-1)])
+
+
 class RandomArbitraryInteger():
     '''Random integer numbers from an arbitrary distribution.
-    
+
     This algorithm is based on
     Vose, A Linear Algorithm For Generating Random
     Numbers With a Given Distribution
@@ -12,21 +15,26 @@ class RandomArbitraryInteger():
     '''
     def __init__(self, x, p=None):
         '''Initialize the object
-        
+
         @param x: integer that will be used by the generator
-        @param p: probability density proile for the distribution. 
+        @param p: probability density proile for the distribution.
             If None (default) every value in `x` will have the same probability
         '''
-        
+
         if p is None:
             p = [1.0, ] * len(x)
         assert len(x) == len(p)
-        
+        self.set_pdf(x, p)
+
+    def set_pdf(self, x, p):
+        '''Set the internal probability distribution function
+        '''
+
+        assert len(x) == len(p)
         x = map(int, x)
-        xSorted = list(x); xSorted.sort()
-        assert xSorted == x
-        assert len(x) == len(set(x))
-        
+        assert issortedAndUnique(x)
+
+
         xMin = x[0]
         xMax = x[-1]
         xActual = range(xMin, xMax + 1, 1)
@@ -51,7 +59,7 @@ class RandomArbitraryInteger():
         p = [v/sump for v in p]
         n = len(p)
         self._n = n
-        
+
         #first stage -- divide indices to small and large
         large = []
         small = []
@@ -61,7 +69,7 @@ class RandomArbitraryInteger():
                 large.append(j)
             else:
                 small.append(j)
-        
+
         #second stage
         prob = [None,] * n
         alias = [None,] * n
@@ -79,15 +87,15 @@ class RandomArbitraryInteger():
             prob[s] = 1.0
         for l in large:
             prob[l] = 1.0
-        
-        
+
+
         self._prob = prob
         self._alias = alias
-                
-        
+
+
     def random(self, n=None):
         '''Return random number or numbers
-        
+
         @param n: amount of random values to return or None
         @return: if n is None: return a scalar, if n>=1 return a list with n
             elements, else raise an exception
@@ -98,7 +106,7 @@ class RandomArbitraryInteger():
         else:
             assert n > 0
             return [self._randOne() for i in range(n)] #@UnusedVariable
-    
+
     def _uniformN(self):
         return random.random() * self._n
 
@@ -112,35 +120,35 @@ class RandomArbitraryInteger():
             ret = self._alias[j]
         return ret + self._xmin
 
-                
+
 import numpy as np
 import scipy.stats as stats
-    
+
 def compareDiscreteDistributions(x, p, theSample):
     '''chi2 test that the difference between distributions is random
-    
+
     Compare the discrete distribution that is defined by `x` and `p` to
     the `sample` using chi2 test. Return p-value that the difference
     between the expected and the observed CDF's is random. If PDF is
     defined using two values (i.e len(x)==2), exact Fisher's test is used
     '''
-    nCells = len(x)    
+    nCells = len(x)
     assert len(x) == len(p)
 
-    nPoints = len(theSample)        
+    nPoints = len(theSample)
     expected = np.array(p, dtype=float) / np.sum(p)
-    
+
     #zero expected values cause division-by-zero. Removing
-    sel = [expected > 0] 
+    sel = [expected > 0]
     expected = expected[sel]
     expected *= nPoints
-    
+
     observed = [0] * nCells
     for i in range(len(x)):
         n = np.sum(theSample == x[i])
         observed[i] = n
-    
-    #remove observed values that correspond to cells with zero expectation 
+
+    #remove observed values that correspond to cells with zero expectation
     observed = np.array(observed)[sel]
     nCells = len(observed)
     if nCells == 1:
@@ -168,8 +176,8 @@ def testRNGIntegerFollowsDistribution():
                 while n < 2:
                     x = np.random.randint(-100, 100, nx)
                     x.sort()
-                    x = np.unique(x) 
-                    p = np.random.random(len(x)) 
+                    x = np.unique(x)
+                    p = np.random.random(len(x))
                     sel = (np.random.random(len(x)) > 0.9)
                     p[sel] = 0.0
                     n = np.sum(p != 0) #at least non-zero beans
@@ -181,10 +189,10 @@ def testRNGIntegerFollowsDistribution():
             prcnt = 100.0 * float(countPvaluesBelowAlpha) / TIMES
             print '%4d cells. p-values below %.2f: %3d (~%.0f%%)'%(
                               nx, ALPHA, countPvaluesBelowAlpha, prcnt)
-                
-        
+
+
 if __name__ == '__main__':
-    
+
     testRNGIntegerFollowsDistribution()
 
 
