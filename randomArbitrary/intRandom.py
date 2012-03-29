@@ -1,5 +1,6 @@
 import random
 import math
+from copy import deepcopy
 
 class RandomArbitraryInteger():
     '''Random integer numbers from an arbitrary distribution.
@@ -18,10 +19,16 @@ class RandomArbitraryInteger():
             If None (default) every value in `x` will have the same probability
         '''
         
+        if len(x) < 2:
+            raise ValueError('At least two values are required')
+        
         if p is None:
             p = [1.0, ] * len(x)
         assert len(x) == len(p)
-        
+        self.set_pdf(x, p)
+          
+    
+    def set_pdf(self, x, p):
         x = map(int, x)
         xSorted = list(x); xSorted.sort()
         assert xSorted == x
@@ -79,10 +86,8 @@ class RandomArbitraryInteger():
             prob[s] = 1.0
         for l in large:
             prob[l] = 1.0
-        
-        
         self._prob = prob
-        self._alias = alias
+        self._alias = alias     
                 
         
     def random(self, n=None):
@@ -113,78 +118,8 @@ class RandomArbitraryInteger():
         return ret + self._xmin
 
                 
-import numpy as np
-import scipy.stats as stats
-    
-def compareDiscreteDistributions(x, p, theSample):
-    '''chi2 test that the difference between distributions is random
-    
-    Compare the discrete distribution that is defined by `x` and `p` to
-    the `sample` using chi2 test. Return p-value that the difference
-    between the expected and the observed CDF's is random. If PDF is
-    defined using two values (i.e len(x)==2), exact Fisher's test is used
-    '''
-    nCells = len(x)    
-    assert len(x) == len(p)
 
-    nPoints = len(theSample)        
-    expected = np.array(p, dtype=float) / np.sum(p)
-    
-    #zero expected values cause division-by-zero. Removing
-    sel = [expected > 0] 
-    expected = expected[sel]
-    expected *= nPoints
-    
-    observed = [0] * nCells
-    for i in range(len(x)):
-        n = np.sum(theSample == x[i])
-        observed[i] = n
-    
-    #remove observed values that correspond to cells with zero expectation 
-    observed = np.array(observed)[sel]
-    nCells = len(observed)
-    if nCells == 1:
-        pdf = 0.0
-    elif nCells >= 2:
-        chi2 = np.sum(((observed - expected) ** 2) / expected)
-        k = len(x) - 1
-        pdf = stats.chi2.pdf(chi2, k)
-    else:
-        table = np.vstack((observed, expected))
-        pdf = stats.fisher_exact(table)[1]
-    return pdf
-
-def testRNGIntegerFollowsDistribution():
-    np.random.seed(11223344)
-    TIMES = 500
-    REPEATS = 3
-    SAMPLES = 1000
-    ALPHA = 0.01
-    for nx in range(8, 40, 2): #number of cells
-        for r in range(REPEATS): #@UnusedVariable
-            countPvaluesBelowAlpha = 0
-            for t in range(TIMES): #@UnusedVariable
-                n = 0
-                while n < 2:
-                    x = np.random.randint(-100, 100, nx)
-                    x.sort()
-                    x = np.unique(x) 
-                    p = np.random.random(len(x)) 
-                    sel = (np.random.random(len(x)) > 0.9)
-                    p[sel] = 0.0
-                    n = np.sum(p != 0) #at least non-zero beans
-                rng = RandomArbitraryInteger(x, p)
-                smpl = rng.random(SAMPLES)
-                pdf = compareDiscreteDistributions(x, p, smpl)
-                if pdf < ALPHA:
-                    countPvaluesBelowAlpha += 1
-            prcnt = 100.0 * float(countPvaluesBelowAlpha) / TIMES
-            print '%4d cells. p-values below %.2f: %3d (~%.0f%%)'%(
-                              nx, ALPHA, countPvaluesBelowAlpha, prcnt)
-                
-        
 if __name__ == '__main__':
-    
-    testRNGIntegerFollowsDistribution()
+    pass
 
 

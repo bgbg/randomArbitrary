@@ -70,7 +70,18 @@ class TestRNG(unittest.TestCase):
             msg = ['%s: random(N) returned an object with a wrong length'%\
                 str(b) for b in lBad]
             self.fail(msg)
-            
+    
+    def testExceptionOnParameterWithOneVariable(self):
+        '''Creating RNG with only one sampling parameter is forbidden'''
+        lBad = []
+        for cls_ in self.classes:
+            try:
+                cls_([0], [1])
+            except ValueError:
+                pass
+            else:
+                lBad.append(cls_)
+        self.assertFalse(lBad)         
     
 
     @staticmethod    

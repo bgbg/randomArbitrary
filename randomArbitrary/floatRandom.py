@@ -19,6 +19,9 @@ class RandomArbitrary:
             default: True
         
         """    
+        
+        if len(x) < 2:
+            raise ValueError('At least two values are required')
         if p == None:
             p = np.ones(len(x))
         self.set_pdf(x, p, Nrl)
@@ -63,8 +66,11 @@ class RandomArbitrary:
         @return: if n is None: return a scalar, if n>=1 return a list with n
             elements, else raise an exception
         """
-
-        idx_f = np.random.uniform(size=n, high=self.Nrl - 1)
+        if n is None:
+            size = 1
+        else:
+            size = n
+        idx_f = np.random.uniform(size=size, high=self.Nrl - 1)
         idx = np.array([idx_f], 'i').reshape(-1)
         y = self.inversecdf[idx] + (idx_f - idx) * self.delta_inversecdf[idx]
         
