@@ -1,7 +1,7 @@
 import unittest
 
 import sys
-sys.path.append(r'../asop')
+sys.path.append(r'../../')
 import randomArbitrary
 import numpy as np
 
