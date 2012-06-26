@@ -11,21 +11,18 @@ class RandomArbitrary:
     http://code.activestate.com/recipes/576556/ Used under the MIT license
     """
 
-    def __init__(self, x=np.arange(0.0, 1.0, .01), p=None, Nrl=1000,
-                 trimOutput=True):
+    def __init__(self, x=np.arange(0.0, 1.0, .01), p=None, Nrl=1000):
         """Initialize the lookup table (with default values if necessary)
         @param x: random number values
         @param p: probability density profile at that point
         @param Nrl: number of reverse look up values between 0 and 1
-        @param trimOutput: should the output values beyong `x` be trimmed?
-            default: True
+
         """
         if p == None:
             p = np.ones(len(x))
         assert len(x) == len(p)
         self.Nrl = Nrl
         self.set_pdf(x, p)
-        self.trimOutput = bool(trimOutput)
 
     def set_pdf(self, x, p, Nrl=None):
         """Generate the lookup tables.
@@ -74,20 +71,6 @@ class RandomArbitrary:
         idx_f = np.random.uniform(size=n, high=self.Nrl - 1)
         idx = np.array([idx_f], 'i').reshape(-1)
         y = self.inversecdf[idx] + (idx_f - idx) * self.delta_inversecdf[idx]
-
-        if self.trimOutput:
-            # We could have done something like:
-            #    y[y<min(x)] = min(x); y[y>max(x)] = max(x)
-            # but this will result in incorrectly high probability for
-            # the minimum and the maximum values, thus we use this, much
-            # slower method
-            mn = min(self.x)
-            mx = max(self.x)
-            for i, v in  enumerate(y):
-                if not mn <= v < mx:
-                    while not mn <= v < mx:
-                        v = self.random(None)
-                    y[i] = v
 
         if n is None:
             y = y[0]
